@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.activeandroid.ActiveAndroid;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -17,6 +19,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        if (BuildConfig.DEBUG)
+            ActiveAndroid.setLoggingEnabled(true);
     }
 
     @Override
