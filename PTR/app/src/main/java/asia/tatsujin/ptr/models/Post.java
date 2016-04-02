@@ -31,7 +31,7 @@ public class Post extends Model {
     public int pttcoin;
 
     public String toString() {
-        return "{num: " + num + ",\n"
+        return "{\nnum: " + num + ",\n"
                 + "author: " + author + ",\n"
                 + "title: " + title + ",\n"
                 + "date: " + date + ",\n"

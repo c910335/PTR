@@ -3,12 +3,18 @@ package asia.tatsujin.ptr;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.activeandroid.ActiveAndroid;
 
+import asia.tatsujin.ptr.graptt.GrapttClient;
+
 public class MainActivity extends AppCompatActivity {
+
+    public static GrapttClient grapttClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,6 +24,28 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         if (BuildConfig.DEBUG)
             ActiveAndroid.setLoggingEnabled(true);
+        grapttClient = new GrapttClient(this, getString(R.string.api_url), new GrapttClient.OnConnectListener() {
+            @Override
+            public void onConnect(String status) {
+                Log.d("G_G", status);
+            }
+
+            @Override
+            public void onError(String message) {
+                Toast.makeText(MainActivity.this, "Error: " + message, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    protected void onDestroy() {
+        grapttClient.close(new GrapttClient.OnDisconnectListener() {
+            @Override
+            public void onDisconnect() {
+                Log.d("G_G", "Disconnected");
+            }
+        });
+        super.onDestroy();
     }
 
     @Override

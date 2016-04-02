@@ -12,7 +12,7 @@ public class Board {
     public boolean unread;
 
     public String toString() {
-        return "{num: " + num + ",\n"
+        return "{\nnum: " + num + ",\n"
                 + "en_name: " + en_name + ",\n"
                 + "zh_name: " + zh_name + ",\n"
                 + "popularity: " + popularity + ",\n"
