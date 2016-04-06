@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
         grapttClient = new GrapttClient(this, getString(R.string.api_url), new GrapttClient.OnConnectListener() {
             @Override
             public void onConnect(String status) {
-                Log.d("G_G", status);
+                Log.d("GrapttClient", status);
             }
 
             @Override
@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         grapttClient.close(new GrapttClient.OnDisconnectListener() {
             @Override
             public void onDisconnect() {
-                Log.d("G_G", "Disconnected");
+                Log.d("GrapttClient", "Disconnected");
             }
         });
         super.onDestroy();

@@ -1,6 +1,7 @@
 package asia.tatsujin.ptr.graptt;
 
 import android.content.Context;
+import android.net.Uri;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
@@ -13,12 +14,15 @@ import com.google.gson.Gson;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import asia.tatsujin.ptr.graptt.data.Response;
 import asia.tatsujin.ptr.models.Board;
 import asia.tatsujin.ptr.models.Post;
+import asia.tatsujin.ptr.models.Push;
 
 /**
  * Created by tatsujin on 2016/3/28.
@@ -50,12 +54,17 @@ public class GrapttClient {
     }
 
     public interface OnEnterBoardListener {
-        void onEnter(String status);
+        void onEnter(String status, String name);
         void onError(String message);
     }
 
     public interface OnGetPostsListener {
         void onGet(Post[] posts);
+        void onError(String message);
+    }
+
+    public interface OnGetPostListener {
+        void onGet(Post post);
         void onError(String message);
     }
 
@@ -67,10 +76,17 @@ public class GrapttClient {
     private String baseURL;
     private RequestQueue requestQueue;
     private String token;
+    private Gson gson;
 
     public GrapttClient(Context context, String baseURL, OnConnectListener onConnectListener) {
         this.baseURL = baseURL;
         requestQueue = Volley.newRequestQueue(context);
+        postConnection(onConnectListener);
+        gson = new Gson();
+    }
+
+    public void reconnect(final OnConnectListener onConnectListener) {
+        close(null);
         postConnection(onConnectListener);
     }
 
@@ -141,7 +157,7 @@ public class GrapttClient {
         put("/connection/" + token + "/board/" + name, null, new OnResponseListener() {
             @Override
             public void onResponse(Response response) {
-                onEnterBoardListener.onEnter(response.status);
+                onEnterBoardListener.onEnter(response.status, response.name);
             }
 
             @Override
@@ -161,6 +177,33 @@ public class GrapttClient {
             @Override
             public void onError(String message) {
                 onGetPostsListener.onError(message);
+            }
+        });
+    }
+
+    public void getPost(String id, final OnGetPostListener onGetPostListener) {
+        if (id == null)
+            id = "nil";
+        else if (id.isEmpty())
+            onGetPostListener.onError("Not Found");
+        else
+            id = Uri.encode(id);
+        get("/connection/" + token + "/post/" + id, new OnResponseListener() {
+            @Override
+            public void onResponse(Response response) {
+                List<Object> content = new ArrayList<>();
+                for (Object line : response.post.content) {
+                    if (! line.getClass().equals(String.class))
+                        line = gson.fromJson(gson.toJson(line), Push.class);
+                    content.add(line);
+                }
+                response.post.content = content;
+                onGetPostListener.onGet(response.post);
+            }
+
+            @Override
+            public void onError(String message) {
+                onGetPostListener.onError(message);
             }
         });
     }
@@ -203,7 +246,7 @@ public class GrapttClient {
                 new com.android.volley.Response.Listener<String>() {
                     @Override
                     public void onResponse(String res) {
-                        Response response = new Gson().fromJson(res, Response.class);
+                        Response response = gson.fromJson(res, Response.class);
                         onResponseListener.onResponse(response);
                     }
                 },
@@ -226,6 +269,6 @@ public class GrapttClient {
             public Map<String, String> getParams() {
                 return params;
             }
-        }.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)));
+        }.setRetryPolicy(new DefaultRetryPolicy(10000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)));
     }
 }

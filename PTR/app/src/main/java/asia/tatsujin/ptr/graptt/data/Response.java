@@ -9,6 +9,8 @@ import asia.tatsujin.ptr.models.Post;
 public class Response {
     public String status;
     public String token;
+    public String name;
     public Board[] boards;
     public Post[] posts;
+    public Post post;
 }

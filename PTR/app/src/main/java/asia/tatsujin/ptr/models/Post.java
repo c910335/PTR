@@ -4,6 +4,8 @@ import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 
+import java.util.List;
+
 /**
  * Created by tatsujin on 2016/3/28.
  */
@@ -29,6 +31,8 @@ public class Post extends Model {
     public String url;
     @Column(name = "pttcoin")
     public int pttcoin;
+    public List<Object> content;
+    public boolean end;
 
     public String toString() {
         return "{\nnum: " + num + ",\n"
