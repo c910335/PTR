@@ -1,5 +1,6 @@
 package asia.tatsujin.ptr;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -18,6 +19,7 @@ public class LoginFragment extends Fragment {
     private EditText usernameEditText;
     private EditText passwordEditText;
     private Button loginButton;
+    private OnTransactListener onTransactListener;
 
     private View view;
     public LoginFragment() {
@@ -41,11 +43,17 @@ public class LoginFragment extends Fragment {
 
         return view;
     }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        onTransactListener = (OnTransactListener) getActivity();
+    }
+
     public void login(){
         String username = usernameEditText.getText().toString();
         String password = passwordEditText.getText().toString();
-
-
+        onTransactListener.onStartTransaction();
         MainActivity.grapttClient.login(username, password, new GrapttClient.OnLoginListener() {
             @Override
             public void onLogin(String status) {

@@ -9,19 +9,23 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.activeandroid.ActiveAndroid;
+import com.vlonjatg.progressactivity.ProgressActivity;
 
 import asia.tatsujin.ptr.graptt.GrapttClient;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OnTransactListener {
 
     public static GrapttClient grapttClient;
+    private ProgressActivity progress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
+
+        progress = (ProgressActivity) findViewById(R.id.progress);
+
         if (BuildConfig.DEBUG)
             ActiveAndroid.setLoggingEnabled(true);
         grapttClient = new GrapttClient(this, getString(R.string.api_url), new GrapttClient.OnConnectListener() {
@@ -36,6 +40,15 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    public void onStartTransaction() {
+        progress.showLoading();
+    }
+
+    public void onFinishTransaction(String title) {
+        setTitle(title);
+        progress.showContent();
+    }
+
     @Override
     protected void onDestroy() {
         grapttClient.close(new GrapttClient.OnDisconnectListener() {
@@ -46,28 +59,4 @@ public class MainActivity extends AppCompatActivity {
         });
         super.onDestroy();
     }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-
 }

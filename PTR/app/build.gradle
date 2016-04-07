@@ -22,6 +22,7 @@ android {
 repositories {
     mavenCentral()
     maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+    maven { url "https://jitpack.io" }
 }
 
 dependencies {
@@ -34,4 +35,5 @@ dependencies {
     compile 'com.google.code.gson:gson:2.6.2'
     compile 'com.android.support:support-v4:23.2.1'
     compile 'com.android.support:recyclerview-v7:23.2.1'
+    compile 'com.github.vlonjatg:progress-activity:v1.0.3'
 }

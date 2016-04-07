@@ -1,10 +1,11 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.vlonjatg.progressactivity.ProgressActivity xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:background="#e3e3e3"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".LoginActivity"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:id="@+id/progress">
 
 <fragment xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -15,4 +16,4 @@
     android:layout_marginTop="?android:actionBarSize"
     tools:layout="@layout/fragment_login"/>
 
-</LinearLayout>
+</com.vlonjatg.progressactivity.ProgressActivity>

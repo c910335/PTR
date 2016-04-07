@@ -17,6 +17,8 @@ import asia.tatsujin.ptr.models.Board;
 
 public class FavoriteFragment extends Fragment implements BoardRecyclerViewAdapter.OnListFragmentInteractionListener {
 
+    private OnTransactListener onTransactListener;
+
     public FavoriteFragment() {
     }
 
@@ -33,6 +35,7 @@ public class FavoriteFragment extends Fragment implements BoardRecyclerViewAdapt
                 @Override
                 public void onGet(List<Board> boards) {
                     recyclerView.setAdapter(new BoardRecyclerViewAdapter(boards, FavoriteFragment.this));
+                    onTransactListener.onFinishTransaction("Favorite");
                 }
 
                 @Override
@@ -45,11 +48,18 @@ public class FavoriteFragment extends Fragment implements BoardRecyclerViewAdapt
     }
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        onTransactListener = (OnTransactListener) getActivity();
+    }
+
+    @Override
     public void onListFragmentInteraction(Board board) {
+        onTransactListener.onStartTransaction();
         MainActivity.grapttClient.enterBoard(board.en_name, new GrapttClient.OnEnterBoardListener() {
             @Override
             public void onEnter(String status, String name) {
-                showPosts();
+                showPosts(name);
             }
 
             @Override
@@ -59,9 +69,9 @@ public class FavoriteFragment extends Fragment implements BoardRecyclerViewAdapt
         });
     }
 
-    public void showPosts() {
+    public void showPosts(String boardName) {
         FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-        PostsFragment postsFragment = new PostsFragment();
+        PostsFragment postsFragment = PostsFragment.newInstance(boardName);
         fragmentTransaction.replace(R.id.fragment, postsFragment)
                 .addToBackStack(null)
                 .commit();
