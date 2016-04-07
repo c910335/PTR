@@ -6,7 +6,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.activeandroid.ActiveAndroid;
 
@@ -32,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onError(String message) {
-                Toast.makeText(MainActivity.this, "Error: " + message, Toast.LENGTH_SHORT).show();
+                Log.d("GrapttClient", message);
             }
         });
     }

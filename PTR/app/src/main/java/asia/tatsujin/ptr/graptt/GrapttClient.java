@@ -68,9 +68,25 @@ public class GrapttClient {
         void onError(String message);
     }
 
-    public interface OnResponseListener {
+    public interface OnCreatePostListener {
+        void onPost(String status);
+        void onError(String message);
+    }
+
+    public interface OnPushListener {
+        void onPush(String status);
+        void onError(String message);
+    }
+
+    private interface OnResponseListener {
         void onResponse(Response response);
         void onError(String message);
+    }
+
+    public static class PushTag {
+        public static final int PUSH = 1;
+        public static final int BOO = 2;
+        public static final int ARROW = 3;
     }
 
     private String baseURL;
@@ -191,6 +207,9 @@ public class GrapttClient {
         get("/connection/" + token + "/post/" + id, new OnResponseListener() {
             @Override
             public void onResponse(Response response) {
+
+
+
                 List<Object> content = new ArrayList<>();
                 for (Object line : response.post.content) {
                     if (! line.getClass().equals(String.class))
@@ -204,6 +223,46 @@ public class GrapttClient {
             @Override
             public void onError(String message) {
                 onGetPostListener.onError(message);
+            }
+        });
+    }
+
+    public void createPost(String title, String content, final OnCreatePostListener onCreatePostListener) {
+        Map<String, String> params = new HashMap<>();
+        params.put("title", title);
+        params.put("content", content);
+        post("/connection/" + token + "/post", params, new OnResponseListener() {
+            @Override
+            public void onResponse(Response response) {
+                onCreatePostListener.onPost(response.status);
+            }
+
+            @Override
+            public void onError(String message) {
+                onCreatePostListener.onError(message);
+            }
+        });
+    }
+
+    public void push(String id, int tag, String content, final OnPushListener onPushListener) {
+        if (id == null)
+            id = "nil";
+        else if (id.isEmpty())
+            onPushListener.onError("Not Found");
+        else
+            id = Uri.encode(id);
+        Map<String, String> params = new HashMap<>();
+        params.put("tag", String.valueOf(tag));
+        params.put("content", content);
+        post("/connection/" + token + "/post/" + id + "/push", params, new OnResponseListener() {
+            @Override
+            public void onResponse(Response response) {
+                onPushListener.onPush(response.status);
+            }
+
+            @Override
+            public void onError(String message) {
+                onPushListener.onError(message);
             }
         });
     }
@@ -262,6 +321,7 @@ public class GrapttClient {
                                 e.printStackTrace();
                             }
                         }
+                        onResponseListener.onError(error.getMessage());
                     }
                 }
         ) {
@@ -269,6 +329,6 @@ public class GrapttClient {
             public Map<String, String> getParams() {
                 return params;
             }
-        }.setRetryPolicy(new DefaultRetryPolicy(10000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)));
+        }.setRetryPolicy(new DefaultRetryPolicy(20000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)));
     }
 }
