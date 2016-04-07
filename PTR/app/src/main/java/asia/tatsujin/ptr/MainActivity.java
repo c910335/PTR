@@ -1,5 +1,6 @@
 package asia.tatsujin.ptr;
 
+
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -16,12 +17,19 @@ public class MainActivity extends AppCompatActivity {
 
     public static GrapttClient grapttClient;
 
+    public static android.support.v4.app.FragmentTransaction fragmentTransaction;
+    public static android.support.v4.app.FragmentManager fragmentManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        fragmentManager = getSupportFragmentManager();
+
+
+
         if (BuildConfig.DEBUG)
             ActiveAndroid.setLoggingEnabled(true);
         grapttClient = new GrapttClient(this, getString(R.string.api_url), new GrapttClient.OnConnectListener() {
@@ -29,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
             public void onConnect(String status) {
                 Log.d("G_G", status);
             }
-
             @Override
             public void onError(String message) {
                 Toast.makeText(MainActivity.this, "Error: " + message, Toast.LENGTH_SHORT).show();
@@ -69,5 +76,6 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 
 }

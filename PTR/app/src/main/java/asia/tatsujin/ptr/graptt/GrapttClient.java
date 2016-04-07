@@ -226,6 +226,6 @@ public class GrapttClient {
             public Map<String, String> getParams() {
                 return params;
             }
-        }.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)));
+        }.setRetryPolicy(new DefaultRetryPolicy(10000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)));
     }
 }
