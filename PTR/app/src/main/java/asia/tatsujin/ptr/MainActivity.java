@@ -1,5 +1,6 @@
 package asia.tatsujin.ptr;
 
+
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -28,7 +29,6 @@ public class MainActivity extends AppCompatActivity {
             public void onConnect(String status) {
                 Log.d("GrapttClient", status);
             }
-
             @Override
             public void onError(String message) {
                 Log.d("GrapttClient", message);
@@ -68,5 +68,6 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 
 }
