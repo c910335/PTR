@@ -31,6 +31,8 @@ public class Post extends Model {
     public String url;
     @Column(name = "pttcoin")
     public int pttcoin;
+    @Column(name = "text")
+    public String text;
     public List<Object> content;
     public boolean end;
 

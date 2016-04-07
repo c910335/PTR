@@ -3,6 +3,8 @@ package asia.tatsujin.ptr.graptt;
 import android.content.Context;
 import android.net.Uri;
 
+import com.activeandroid.query.Delete;
+import com.activeandroid.query.Select;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -49,7 +51,7 @@ public class GrapttClient {
     }
 
     public interface OnGetFavoriteListener {
-        void onGet(Board[] boards);
+        void onGet(List<Board> boards);
         void onError(String message);
     }
 
@@ -59,7 +61,7 @@ public class GrapttClient {
     }
 
     public interface OnGetPostsListener {
-        void onGet(Post[] posts);
+        void onGet(List<Post> posts);
         void onError(String message);
     }
 
@@ -89,10 +91,12 @@ public class GrapttClient {
         public static final int ARROW = 3;
     }
 
+    private static final int POST_MAX_CACHE_NUM = 20;
     private String baseURL;
     private RequestQueue requestQueue;
     private String token;
     private Gson gson;
+    private Post post;
 
     public GrapttClient(Context context, String baseURL, OnConnectListener onConnectListener) {
         this.baseURL = baseURL;
@@ -198,8 +202,10 @@ public class GrapttClient {
     }
 
     public void getPost(String id, final OnGetPostListener onGetPostListener) {
-        if (id == null)
+        final boolean isNewPost = id != null;
+        if (id == null) {
             id = "nil";
+        }
         else if (id.isEmpty())
             onGetPostListener.onError("Not Found");
         else
@@ -207,12 +213,10 @@ public class GrapttClient {
         get("/connection/" + token + "/post/" + id, new OnResponseListener() {
             @Override
             public void onResponse(Response response) {
-
-
-
+                cachePost(response.post, isNewPost);
                 List<Object> content = new ArrayList<>();
                 for (Object line : response.post.content) {
-                    if (! line.getClass().equals(String.class))
+                    if (!line.getClass().equals(String.class))
                         line = gson.fromJson(gson.toJson(line), Push.class);
                     content.add(line);
                 }
@@ -225,6 +229,20 @@ public class GrapttClient {
                 onGetPostListener.onError(message);
             }
         });
+    }
+
+    public List<Post> getCachedPosts() {
+        List<Post> posts = new Select().from(Post.class).execute();
+        for (Post post : posts) {
+            post.content = new ArrayList<>();
+            for (String line: post.text.split("\n")) {
+                if (line.startsWith("{\"tag\":\""))
+                    post.content.add(gson.fromJson(line, Push.class));
+                else
+                    post.content.add(line);
+            }
+        }
+        return posts;
     }
 
     public void createPost(String title, String content, final OnCreatePostListener onCreatePostListener) {
@@ -265,6 +283,26 @@ public class GrapttClient {
                 onPushListener.onError(message);
             }
         });
+    }
+
+    private void cachePost(Post post, boolean isNewPost) {
+        if (isNewPost) {
+            this.post = post;
+            Post oldPost = new Select().from(Post.class).where("id = ?", post.id).executeSingle();
+            if (oldPost != null)
+                oldPost.delete();
+            else
+                while (new Select().from(Post.class).count() >= POST_MAX_CACHE_NUM)
+                    new Delete().from(Post.class).executeSingle();
+            post.text = "";
+        }
+        for (Object line : post.content) {
+            if (line.getClass().equals(String.class))
+                this.post.text += line + "\n";
+            else
+                this.post.text += gson.toJson(line) + "\n";
+        }
+        this.post.save();
     }
 
     private void postConnection(final OnConnectListener onConnectListener) {
